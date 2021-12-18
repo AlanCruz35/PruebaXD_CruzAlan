@@ -1,0 +1,36 @@
+***** 1.- ¿Cuál es el nombre aeropuerto que ha tenido mayor movimiento durante el año *****
+SELECT a.NOMBRE_AEROPUERTO 
+FROM aeropuertos a
+INNER JOIN vuelos v 
+ON a.ID_AEROPUERTO = v.ID_AEROPUERTO
+GROUP BY NOMBRE_AEROPUERTO
+HAVING count() = (SELECT max(contador) FROM 
+(SELECT ID_AEROPUERTO, count() contador FROM 
+vuelos GROUP BY ID_AEROPUERTO) AS mayor_movimiento);
+
+
+**2.- ¿Cuál es el nombre aerolínea que ha realizado mayor número de vuelos durante el año?**
+SELECT a.NOMBRE_AEROLINEA 
+FROM aerolineas AS a
+INNER JOIN vuelos AS v
+ON a.ID_AEROLINEA = v.ID_AEROLINEA 
+GROUP BY NOMBRE_AEROLINEA 
+HAVING count() = (SELECT max(contador) FROM 
+(SELECT ID_AEROLINEA, count() contador FROM 
+vuelos GROUP BY ID_AEROLINEA) AS mayorN_Vuelos);
+
+
+********* 3.- ¿En qué día se han tenido mayor número de vuelos? *********
+SELECT dia 
+FROM vuelos 
+GROUP BY dia HAVING count() = (SELECT max(contador) 
+FROM (SELECT dia, count() as contador FROM vuelos GROUP BY dia) AS v);
+
+
+********* 4.- ¿Cuáles son las aerolíneas que tienen mas de 2 vuelos por día?*********
+SELECT a.NOMBRE_AEROLINEA 
+FROM aerolineas AS a
+INNER JOIN (SELECT ID_AEROLINEA FROM (SELECT ID_AEROLINEA, dia, COUNT() 
+FROM vuelos GROUP BY ID_AEROLINEA, dia HAVING COUNT() > 2) as grupo 
+GROUP BY ID_AEROLINEA) AS ids
+WHERE a.ID_AEROLINEA = ids.ID_AEROLINEA
